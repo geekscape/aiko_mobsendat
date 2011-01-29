@@ -6,13 +6,15 @@
  *
  * To Do
  * ~~~~~
- * - Nothing yet
+ * - Determine barometric sensor sample time.
+ * - Provide a barometric calibration mechanism ... using EEPROM ?
+ * - Transform barometric pressure into altitude.
  */
 
 #define BMP085_I2C_ADDRESS 0x77
 
 const unsigned char oversampling_setting = 3;
-const unsigned char pressure_waittime[4] = {5, 8, 14, 26};
+const unsigned char pressure_waittime[4] = { 5, 8, 14, 26 };
 
   int ac1;
   int ac2;
@@ -27,23 +29,23 @@ const unsigned char pressure_waittime[4] = {5, 8, 14, 26};
   int md;
 
 void barometricInitialize() {
-  
+  Wire.begin();
+ 
   bmp085_get_cal_data();
 }
 
-void bmp085_get_cal_data()
-{
+void bmp085_get_cal_data() {
   ac1 = read_int_register(0xAA);
   ac2 = read_int_register(0xAC);
   ac3 = read_int_register(0xAE);
   ac4 = read_int_register(0xB0);
   ac5 = read_int_register(0xB2);
   ac6 = read_int_register(0xB4);
-  b1 = read_int_register(0xB6);
-  b2 = read_int_register(0xB8);
-  mb = read_int_register(0xBA);
-  mc = read_int_register(0xBC);
-  md = read_int_register(0xBE);
+  b1  = read_int_register(0xB6);
+  b2  = read_int_register(0xB8);
+  mb  = read_int_register(0xBA);
+  mc  = read_int_register(0xBC);
+  md  = read_int_register(0xBE);
 }
 
 void barometricHandler() {
@@ -54,11 +56,9 @@ void barometricHandler() {
   long up = bmp085_read_up();
   long x1, x2, x3, b3, b5, b6, p;
   unsigned long b4, b7;
- 
- 
 
   //calculate the temperature
-  x1 = ((long)ut - ac6) * ac5 >> 15;
+  x1 = ((long) ut - ac6) * ac5 >> 15;
   x2 = ((long) mc << 11) / (x1 + md);
   b5 = x1 + x2;
   temperature = (b5 + 8) >> 4;
@@ -97,18 +97,14 @@ void barometricHandler() {
   sendMessage(globalString);
 }
 
-unsigned int bmp085_read_ut()
-{
-  write_register(0xf4,0x2e);
+unsigned int bmp085_read_ut() {
+  write_register(0xf4, 0x2e);
   delay(5);
   return read_int_register(0xf6);
 }
 
-
-
-long bmp085_read_up()
-{
-  write_register(0xf4,0x34+(oversampling_setting<<6));
+long bmp085_read_up() {
+  write_register(0xf4, 0x34 + (oversampling_setting << 6));
   delay(pressure_waittime[oversampling_setting]);
   unsigned char msb, lsb, xlsb;
   
@@ -117,48 +113,52 @@ long bmp085_read_up()
   Wire.endTransmission();
 
   Wire.requestFrom(BMP085_I2C_ADDRESS, 3);
-  while(!Wire.available());
+  while(! Wire.available());
   msb = Wire.receive();
-  while(!Wire.available());
+  while(! Wire.available());
   lsb |= Wire.receive();
-  while(!Wire.available());
+  while(! Wire.available());
   xlsb |= Wire.receive();
 
-  return (((long)msb << 16) | ((long)lsb << 8) | ((long)xlsb)) >> (8 - oversampling_setting);
+  return (((long) msb << 16) | ((long) lsb << 8) | ((long) xlsb)) >> (8 - oversampling_setting);
 }
 
-void write_register(unsigned char r, unsigned char v)
-{
+void write_register(
+  unsigned char r,
+  unsigned char v) {
+
   Wire.beginTransmission(BMP085_I2C_ADDRESS);
   Wire.send(r);
   Wire.send(v);
   Wire.endTransmission();
 }
 
-char read_register(unsigned char r)
-{
+char read_register(
+  unsigned char r) {
+
   unsigned char v;
   Wire.beginTransmission(BMP085_I2C_ADDRESS);
   Wire.send(r); // register to read
   Wire.endTransmission();
 
   Wire.requestFrom(BMP085_I2C_ADDRESS, 1); // read a byte
-  while(!Wire.available());
+  while(! Wire.available());
   v = Wire.receive();
   return v;
 }
 
-int read_int_register(unsigned char r)
-{
+int read_int_register(
+  unsigned char r) {
+
   unsigned char msb, lsb;
   Wire.beginTransmission(BMP085_I2C_ADDRESS);
   Wire.send(r); // register to read
   Wire.endTransmission();
 
   Wire.requestFrom(BMP085_I2C_ADDRESS, 2); // read a byte
-  while(!Wire.available());
+  while(! Wire.available());
   msb = Wire.receive();
-  while(!Wire.available());
+  while(! Wire.available());
   lsb = Wire.receive();
-  return (((int)msb<<8) | ((int)lsb));
+  return (((int) msb << 8) | ((int) lsb));
 }

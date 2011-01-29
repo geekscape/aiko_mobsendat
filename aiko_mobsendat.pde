@@ -31,25 +31,30 @@
  *
  * To Do
  * ~~~~~
+ * - Check license status of all test code.
+ * - Measure cost of each sensor sample and aggregate total time.  Is it okay ?
  * - #define for feature enable / disable.
  * - Separate configuration include file.
+ * - Support hardware UART serial output for diagnosis without ZigBee and GPS.
  * - Logging to micro-SD storage.
  * - One-wire temperature sensor.
- * - Barometric pressure and temperature.
  * - GPS latitude, longitude, altitude, speed.
  * - 3-axis accelerometer (SPI).
  * - Real Time Clock (write record to storage).
- * - State machine to track rocket through ready/boost/flight/recovery/landed stages.
+ * - State machine track rocket through ready/boost/flight/recovery/landed.
  *
  * Notes
  * ~~~~~
- * - Millisecond counter cycles after 9 hours, 6 minutes and 7 seconds (a very long rocket flight).
+ * - Millisecond counter cycles after 9 hours, 6 minutes and 7 seconds.
  * - Records format ...
  *   - a:x1,y1,z1,x2,y2,z2,...  # accelerometer x, y, z-axis (m*m/s)
  *   - b:voltage                # battery voltage (volt)
  *   - d:yyyy-mm-dd hh:mm:ss    # real time clock date/time
+ *   - e:message                # error message
  *   - g:latitude,longitude,altitude,speed,course,fix,age,date,time
- *   - p:pressure,temperature   # barometer pressure (pascals) and temperature (celcius)
+ *                              # gps message
+ *   - i:message                # informational message
+ *   - p:pressure,temperature   # barometer pressure (pascals), temperature (celcius)
  *   - r:seconds.milliseconds   # run-time since boot
  *   - t:temperature            # one-wire temperature (celcius)
  */
@@ -68,18 +73,25 @@ using namespace Aiko;
 
 char globalBuffer[GLOBAL_BUFFER_SIZE];  // Store dynamically constructed string
 PString globalString(globalBuffer, sizeof(globalBuffer));
-  
+
+// Accelerometer shared state
+byte accelBuffer[40][6];
+byte accelSamples;
+
 void setup() {
-  Wire.begin();
-  
   serialInitialize();
+  accelInitalize();
+  storageInitialize();
   barometricInitialize();
 
   Events.addHandler(heartbeatHandler,    HEARTBEAT_PERIOD);
   Events.addHandler(millisecondHandler,                 1);
+  Events.addHandler(barometricHandler,                100);
   Events.addHandler(batteryHandler,                  1000);
   Events.addHandler(barometricHandler,               1000);
   Events.addHandler(temperatureHandler,              1000);
+  Events.addHandler(accelHandler,                     100);
+  Events.addHandler(accelDump,                       1000);
 }
 
 void loop() {
@@ -107,13 +119,6 @@ void sendMessage(
   const char* message) {
 
   serial.println(message);
-}
-
-void errorMessage(
-  const char* message) {
-
-  sendMessage("error: ");
-  sendMessage(message);
 }
 
 /* ------------------------------------------------------------------------- */
