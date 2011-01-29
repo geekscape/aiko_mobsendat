@@ -1,12 +1,12 @@
 /* temperature.pde
- * ~~~~~~~~~~~
+ * ~~~~~~~~~~~~~~~
  * Please do not remove the following notices.
  * License: GPLv3. http://geekscape.org/static/arduino_license.html
  * ----------------------------------------------------------------------------
  *
  * To Do
  * ~~~~~
- * - Switch commented-out error messages to use globalString
+ * - Switch commented-out error messages to use globalString.
  */
 
 #define ONE_WIRE_COMMAND_READ_SCRATCHPAD  0xBE
@@ -33,6 +33,7 @@ void temperatureHandler() {  // total time: 33 milliseconds
     oneWire.reset_search();         // time: <1 millisecond
     return;
   }
+
 /*
   Serial.print("OneWire device: ");
   for (index = 0; index < 8; index ++) {
@@ -41,6 +42,7 @@ void temperatureHandler() {  // total time: 33 milliseconds
   }
   Serial.println();
  */
+
   if (OneWire::crc8(address, 7) != address[7]) {
 //  sendMessage("(error 'Address CRC is not valid')");
     return;
@@ -59,6 +61,7 @@ void temperatureHandler() {  // total time: 33 milliseconds
     for (index = 0; index < 9; index++) {             // time: 5 milliseconds
       data[index] = oneWire.read();
     }
+
 /*
     Serial.print("Scratchpad: ");
     Serial.print(present, HEX);
@@ -69,6 +72,7 @@ void temperatureHandler() {  // total time: 33 milliseconds
     }
     Serial.println();
  */
+
     if (OneWire::crc8(data, 8) != data[8]) {
 //    sendMessage("(error 'Data CRC is not valid')");
       return;
@@ -101,7 +105,6 @@ void temperatureHandler() {  // total time: 33 milliseconds
   // Must wait at least 750 milliseconds for temperature conversion to complete
   oneWireInitialized = true;
 }
-
 
 /*
 void processOneWireListDevices(void) {
