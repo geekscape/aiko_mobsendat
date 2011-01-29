@@ -13,7 +13,7 @@ const int DEFAULT_BAUD_RATE = 38400;
 
 const int HEARTBEAT_PERIOD = 250;  // milliseconds (increase to 1 second for flight)
 
-const int GLOBAL_BUFFER_SIZE = 16;
+const int GLOBAL_BUFFER_SIZE = 32;
 
 // Digital Input/Output pins
 const int PIN_GPS_RX =            0;  // GPS and Arduino programming
