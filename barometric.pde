@@ -86,10 +86,15 @@ void barometricHandler() {
   x2 = (-7357 * p) >> 16;
   pressure = p + ((x1 + x2 + 3791) >> 4);
   
-  serial.print("p:");
-  serial.print(pressure);
-  serial.print(",");
-  serial.println(temperature);
+  globalString.begin();
+  globalString  = "p:";
+  globalString += pressure;
+  globalString += ",";
+  globalString += (((temperature - (temperature % 10)) / 10));
+  globalString += (".");
+  globalString += (temperature % 10);
+  
+  sendMessage(globalString);
 }
 
 unsigned int bmp085_read_ut()
