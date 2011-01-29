@@ -73,10 +73,13 @@ byte accelSamples;
 
 void setup() {
   serialInitialize();
+  accelInitalize();
 
   Events.addHandler(heartbeatHandler,    HEARTBEAT_PERIOD);
   Events.addHandler(millisecondHandler,                 1);
   Events.addHandler(batteryHandler,                  1000);
+  Events.addHandler(accelHandler,                     100);
+  Events.addHandler(accelDump,                       1000);
 }
 
 void loop() {

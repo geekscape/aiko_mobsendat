@@ -92,6 +92,22 @@ void accelHandler() {
     }
 }
 
+void accelDump() {
+    float x, y, z;
+    int i;
+    for (i=0; i<accelSamples; i++) {
+        x = (float)((accelBuffer[i][1]<<8) | accelBuffer[i][0]) / 250.0;
+        y = (float)((accelBuffer[i][3]<<8) | accelBuffer[i][2]) / 250.0;
+        z = (float)((accelBuffer[i][5]<<8) | accelBuffer[i][4]) / 250.0;
+        serial.print("a: ");
+        serial.print(x);
+        serial.print(", ");
+        serial.print(y);
+        serial.print(", ");
+        serial.println(z);
+    }
+}
+
 #if 0
     while (accelSamples !=0) {
         accelSamples--;
