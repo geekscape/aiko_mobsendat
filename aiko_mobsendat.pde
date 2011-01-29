@@ -73,8 +73,13 @@ using namespace Aiko;
 char globalBuffer[GLOBAL_BUFFER_SIZE];  // Store dynamically constructed string
 PString globalString(globalBuffer, sizeof(globalBuffer));
 
+// Accelerometer shared state
+byte accelBuffer[40][6];
+byte accelSamples;
+
 void setup() {
   serialInitialize();
+  accelInitalize();
   storageInitialize();
   barometricInitialize();
 
@@ -82,6 +87,8 @@ void setup() {
   Events.addHandler(millisecondHandler,                 1);
   Events.addHandler(barometricHandler,                100);
   Events.addHandler(batteryHandler,                  1000);
+  Events.addHandler(accelHandler,                     100);
+  Events.addHandler(accelDump,                       1000);
 }
 
 void loop() {
