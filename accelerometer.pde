@@ -122,11 +122,14 @@ void accelerometerDump() {
     z = (float)
         ((accelerometerBuffer[i][5] << 8) | accelerometerBuffer[i][4]) / 250.0;
 
-    serial.print("a: ");
-    serial.print(x);
-    serial.print(", ");
-    serial.print(y);
-    serial.print(", ");
-    serial.println(z);
+    globalString.begin();
+    globalString  = "a:";
+    globalString += x;
+    globalString += ",";
+    globalString += y;
+    globalString += ",";
+    globalString += z;
+
+    sendMessage(globalString);
   }
 }
