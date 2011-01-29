@@ -6,7 +6,7 @@
  *
  * To Do
  * ~~~~~
- * - None, yet.
+ * - Replace sendMessage() with a combined storage / transmit method.
  */
 
 Sd2Card  card;
@@ -15,15 +15,13 @@ SdFile   root;
 SdFile   file;
 
 void storageInitialize() {
+  if (digitalRead(PIN_SD_CARD_DETECT)) {
+    Events.addHandler(storageMissingHandler, 5000);
+  }
+  else {
+    sendMessage("i:MicroSD card detected");
+  }
 /*
-  if (digitalRead(PIN_SD_CARD_DETECT))
-  {
-    error("microSD card is not inserted!");
-  }
-  else
-  {
-    PRNln("microSD card inserted.");
-  }
   if (!card.init(SPI_HALF_SPEED, PIN_SD_CARD_SELECT)) error("card.init");
   // initialize a FAT volume
   if (!volume.init(card)) error("volume.init");
@@ -46,6 +44,10 @@ void storageInitialize() {
   PRNln(name);
   file.writeError = 0;
  */
+}
+
+void storageMissingHandler() {
+  sendMessage("e:MicroSD card missing");
 }
 
 void storageHandler() {

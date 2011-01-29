@@ -33,6 +33,7 @@
  * ~~~~~
  * - #define for feature enable / disable.
  * - Separate configuration include file.
+ * - Support serial output on hardware UART (pin 1) for diagnosis without ZigBee and GPS.
  * - Logging to micro-SD storage.
  * - One-wire temperature sensor.
  * - Barometric pressure and temperature.
@@ -48,7 +49,10 @@
  *   - a:x1,y1,z1,x2,y2,z2,...  # accelerometer x, y, z-axis (m*m/s)
  *   - b:voltage                # battery voltage (volt)
  *   - d:yyyy-mm-dd hh:mm:ss    # real time clock date/time
+ *   - e:message                # error message
  *   - g:latitude,longitude,altitude,speed,course,fix,age,date,time
+ *                              # gps message
+ *   - i:message                # informational message
  *   - p:pressure,temperature   # barometer pressure (pascals) and temperature (celcius)
  *   - r:seconds.milliseconds   # run-time since boot
  *   - t:temperature            # one-wire temperature (celcius)
@@ -74,6 +78,7 @@ byte accelSamples;
 void setup() {
   serialInitialize();
   accelInitalize();
+  storageInitialize();
 
   Events.addHandler(heartbeatHandler,    HEARTBEAT_PERIOD);
   Events.addHandler(millisecondHandler,                 1);
@@ -103,6 +108,12 @@ void serialInitialize(void) {
   serialInitialized = true;
 }
 
+void sendMessage(
+  const char* message) {
+
+  serial.println(message);
+}
+
 /* ------------------------------------------------------------------------- */
 
 int millisecondCounter = 0;
@@ -117,14 +128,14 @@ void millisecondHandler(void) {
 }
 
 void heartbeatHandler(void) {
-  serial.println(millisecondCounterAsString());
+  sendMessage(millisecondCounterAsString());
 
   if (serial.available() > 0) {
     int ch = serial.read();
 
     if (ch == 'r')  {
       resetCounter();
-      serial.println("reset");
+      sendMessage("reset");
     }
   }
 }
@@ -145,4 +156,3 @@ void resetCounter(void) {
 }
 
 /* ------------------------------------------------------------------------- */
-
