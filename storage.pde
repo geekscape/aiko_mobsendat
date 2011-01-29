@@ -16,14 +16,14 @@ SdFile   file;
 
 void storageInitialize() {
 /*
-  if (digitalRead(PIN_SD_CARD_DETECT))
-  {
+  if (digitalRead(PIN_SD_CARD_DETECT)) {
     error("microSD card is not inserted!");
   }
-  else
-  {
+  else {
     PRNln("microSD card inserted.");
   }
+ */
+/*
   if (!card.init(SPI_HALF_SPEED, PIN_SD_CARD_SELECT)) error("card.init");
   // initialize a FAT volume
   if (!volume.init(card)) error("volume.init");

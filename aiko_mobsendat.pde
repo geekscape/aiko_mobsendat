@@ -96,6 +96,19 @@ void serialInitialize(void) {
   serialInitialized = true;
 }
 
+void sendMessage(
+  const char* message) {
+
+  serial.println(message);
+}
+
+void errorMessage(
+  const char* message) {
+
+  sendMessage("error: ");
+  sendMessage(message);
+}
+
 /* ------------------------------------------------------------------------- */
 
 int millisecondCounter = 0;
@@ -110,14 +123,14 @@ void millisecondHandler(void) {
 }
 
 void heartbeatHandler(void) {
-  serial.println(millisecondCounterAsString());
+  sendMessage(millisecondCounterAsString());
 
   if (serial.available() > 0) {
     int ch = serial.read();
 
     if (ch == 'r')  {
       resetCounter();
-      serial.println("reset");
+      sendMessage("reset");
     }
   }
 }
@@ -138,4 +151,3 @@ void resetCounter(void) {
 }
 
 /* ------------------------------------------------------------------------- */
-
