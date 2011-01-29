@@ -10,6 +10,7 @@
  * - Seriously verify the accelerometer data !
  * - Check to see if we need to deselect the SPI bus between commands.
  * - Determine whether setup() delay loops can be optimized, i.e removed.
+ * - Configure axis labels depending upon orientation ... using EEPROM.
  */
 
 byte accelerometerBuffer[40][6];
