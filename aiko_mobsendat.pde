@@ -17,11 +17,17 @@
  * - Aiko framework
  *   https://github.com/geekscape/Aiko
  *
- * - NewSoftSerial (download is at the bottom of the web page)
+ * - NewSoftSerial library (download is at the bottom of the web page)
  *   http://arduiniana.org/libraries/newsoftserial
  *
- * - PString
+ * - PString library
  *   http://arduiniana.org/libraries/pstring
+ *
+ * - SDFat library
+ *   URL ?
+ *
+ * - SPI library (3rd party "Spi", not Arduino bundled "SPI" library)
+ *   URL ?
  *
  * To Do
  * ~~~~~
@@ -47,6 +53,8 @@
  */
 
 #include <PString.h>
+#include <SdFat.h>
+#include <Spi.h>
 
 #include <AikoEvents.h>
 
