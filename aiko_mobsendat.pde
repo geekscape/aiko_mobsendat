@@ -37,10 +37,11 @@
  * - Separate configuration include file.
  * - Support hardware UART serial output for diagnosis without ZigBee and GPS.
  * - Logging to micro-SD storage.
+ * - Write records properly, including millisecondCounter records.
  * - One-wire temperature sensor.
  * - GPS latitude, longitude, altitude, speed.
- * - 3-axis accelerometer (SPI).
  * - Real Time Clock (write record to storage).
+ * - Selection of records to be transmitted by radio.
  * - State machine track rocket through ready/boost/flight/recovery/landed.
  *
  * Notes
@@ -74,24 +75,20 @@ using namespace Aiko;
 char globalBuffer[GLOBAL_BUFFER_SIZE];  // Store dynamically constructed string
 PString globalString(globalBuffer, sizeof(globalBuffer));
 
-// Accelerometer shared state
-byte accelBuffer[40][6];
-byte accelSamples;
-
 void setup() {
   serialInitialize();
-  accelInitalize();
   storageInitialize();
+
+  accelerometerInitalize();
   barometricInitialize();
 
   Events.addHandler(heartbeatHandler,    HEARTBEAT_PERIOD);
   Events.addHandler(millisecondHandler,                 1);
+  Events.addHandler(accelerometerHandler,             100);
+  Events.addHandler(accelerometerDump,               1000);
   Events.addHandler(barometricHandler,                100);
   Events.addHandler(batteryHandler,                  1000);
-  Events.addHandler(barometricHandler,               1000);
   Events.addHandler(temperatureHandler,              1000);
-  Events.addHandler(accelHandler,                     100);
-  Events.addHandler(accelDump,                       1000);
 }
 
 void loop() {
