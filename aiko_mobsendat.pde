@@ -25,12 +25,14 @@
  *
  * To Do
  * ~~~~~
+ * - #define for feature enable / disable.
+ * - Separate configuration include file.
  * - Logging to micro-SD storage.
  * - Battery monitor.
  * - One-wire temperature sensor.
  * - Barometric pressure and temperature.
  * - 3-axis accelerometer (SPI).
- * - Real Time Clock.
+ * - Real Time Clock (write record to storage).
  *
  * Notes
  * ~~~~~
@@ -145,3 +147,4 @@ void resetCounter(void) {
 }
 
 /* ------------------------------------------------------------------------- */
+
