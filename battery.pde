@@ -6,12 +6,15 @@
  *
  * To Do
  * ~~~~~
- * - None, yet.
+ * - Put battery calibration constant into EEPROM.
+ * - Is it cheaper to perform integer rather than floating arithmetic here ?
  */
 
+const float BATTERY_CALIBRATION = 88.0f;
+
 void batteryHandler() {
-  float voltage = 0.0;
-  voltage = ((float)(analogRead(PIN_BATTERY_VOLTAGE) / (float)88));
+  float voltage = ((float) (analogRead(PIN_BATTERY_VOLTAGE) / BATTERY_CALIBRATION));
+
   serial.print("b:");
   serial.println(voltage);
 }
