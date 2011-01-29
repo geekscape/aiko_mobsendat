@@ -67,6 +67,10 @@ using namespace Aiko;
 char globalBuffer[GLOBAL_BUFFER_SIZE];  // Store dynamically constructed string
 PString globalString(globalBuffer, sizeof(globalBuffer));
 
+// Accelerometer shared state
+byte accelBuffer[40][6];
+byte accelSamples;
+
 void setup() {
   serialInitialize();
 

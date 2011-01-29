@@ -8,7 +8,6 @@
  * PIN_ACCEL_SELECT: Accelerometer SPI select
  * byte accelBuffer[40][6];  //oversize so it doesn't overflow
  * byte accelSamples;  //points to last array element
- * byte adxlFIFO;  //adxl fifo status register
  *
  * To Do
  * ~~~~~
@@ -17,7 +16,10 @@
 
 #include <Spi.h>
 
-void accelInitalize {
+byte adxlFIFO;  //adxl fifo status register
+
+void accelInitalize() {
+    short readData;
     /* Setup the registers */
     Spi.mode((1 << SPE) | (1 << MSTR) | (1 << CPOL) | (1 << CPHA) | (1
                 << SPR1) | (1 << SPR0));
