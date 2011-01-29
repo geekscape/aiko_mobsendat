@@ -57,6 +57,7 @@
 #include <PString.h>
 #include <SdFat.h>
 #include <Spi.h>
+#include "Wire.h"
 
 #include <AikoEvents.h>
 
@@ -68,11 +69,15 @@ char globalBuffer[GLOBAL_BUFFER_SIZE];  // Store dynamically constructed string
 PString globalString(globalBuffer, sizeof(globalBuffer));
 
 void setup() {
+  Wire.begin();
+  
   serialInitialize();
+  barometricInitialize();
 
   Events.addHandler(heartbeatHandler,    HEARTBEAT_PERIOD);
   Events.addHandler(millisecondHandler,                 1);
   Events.addHandler(batteryHandler,                  1000);
+  Events.addHandler(barometricHandler,               1000);
 }
 
 void loop() {
