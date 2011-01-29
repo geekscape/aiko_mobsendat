@@ -33,6 +33,7 @@
  * ~~~~~
  * - #define for feature enable / disable.
  * - Separate configuration include file.
+ * - Support serial output on hardware UART (pin 1) for diagnosis without ZigBee and GPS.
  * - Logging to micro-SD storage.
  * - One-wire temperature sensor.
  * - Barometric pressure and temperature.
