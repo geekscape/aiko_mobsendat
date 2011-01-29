@@ -9,8 +9,6 @@
  * - None, yet.
  */
 
-#include "aiko_mobsendat.h"
-
 void batteryHandler() {
   serial.println("battery");
 }
