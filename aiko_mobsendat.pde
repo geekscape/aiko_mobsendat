@@ -20,15 +20,21 @@
  * - NewSoftSerial (download is at the bottom of the web page)
  *   http://arduiniana.org/libraries/newsoftserial
  *
+ * - PString
+ *   http://arduiniana.org/libraries/pstring
+ *
  * To Do
  * ~~~~~
- * - Millisecond timer and heartbeat.
  * - Logging to micro-SD storage.
  * - Battery monitor.
  * - One-wire temperature sensor.
  * - Barometric pressure and temperature.
  * - 3-axis accelerometer (SPI).
  * - Real Time Clock.
+ *
+ * Notes
+ * ~~~~~
+ * - Millisecond counter cycles after 9 hours, 6 minutes and 7 seconds (a very long rocket flight).
  */
 
 #include <AikoEvents.h>
@@ -36,7 +42,9 @@
 using namespace Aiko;
 
 #define DEFAULT_BAUD_RATE 38400
- 
+
+#define HEARTBEAT_PERIOD   250 // milliseconds (increase to 1 second for flight)
+
 // Digital Input/Output pins
 #define PIN_GPS_RX              0  // GPS and Arduino programming
 #define PIN_GPS_TX              1  // GPS and Arduino programming
@@ -61,10 +69,17 @@ using namespace Aiko;
 #define PIN_I2C_SDA             4  // I2C bus SDA
 #define PIN_I2C_SCL             5  // I2C bus SCL
 
+#include <PString.h>
+#define GLOBAL_BUFFER_SIZE 16
+
+char globalBuffer[GLOBAL_BUFFER_SIZE];  // Store dynamically constructed strings
+PString globalString(globalBuffer, sizeof(globalBuffer));
+
 void setup() {
   serialInitialize();
 
-  Events.addHandler(serialTest, 100);
+  Events.addHandler(heartbeatHandler, HEARTBEAT_PERIOD);
+  Events.addHandler(millisecondHandler, 1);
 }
 
 void loop() {
@@ -88,13 +103,45 @@ void serialInitialize(void) {
   serialInitialized = true;
 }
 
-void serialTest(void) {
-  serial.println("test");
+/* ------------------------------------------------------------------------- */
+
+int millisecondCounter = 0;
+int secondCounter = 0;
+
+void millisecondHandler(void) {
+  if ((++ millisecondCounter) == 1000) {
+    millisecondCounter = 0;
+
+    ++ secondCounter;
+  }
+}
+
+void heartbeatHandler(void) {
+  serial.println(millisecondCounterAsString());
+
   if (serial.available() > 0) {
     int ch = serial.read();
 
-    if (ch == 'r')  serial.println("reset");
+    if (ch == 'r')  {
+      resetCounter();
+      serial.println("reset");
+    }
   }
+}
+
+const char *millisecondCounterAsString() {
+  globalString.begin();
+  globalString  = "t:";
+  globalString += secondCounter;
+  globalString += ".";
+  if (millisecondCounter < 10)  globalString += "0";
+  if (millisecondCounter < 100) globalString += "0";
+  globalString += millisecondCounter;
+  return(globalString);
+}
+
+void resetCounter(void) {
+  secondCounter = millisecondCounter = 0;
 }
 
 /* ------------------------------------------------------------------------- */
