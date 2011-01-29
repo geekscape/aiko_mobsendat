@@ -31,20 +31,21 @@
  *
  * To Do
  * ~~~~~
+ * - Check license status of all test code.
+ * - Measure cost of each sensor sample and aggregate total time.  Is it okay ?
  * - #define for feature enable / disable.
  * - Separate configuration include file.
- * - Support serial output on hardware UART (pin 1) for diagnosis without ZigBee and GPS.
+ * - Support hardware UART serial output for diagnosis without ZigBee and GPS.
  * - Logging to micro-SD storage.
  * - One-wire temperature sensor.
- * - Barometric pressure and temperature.
  * - GPS latitude, longitude, altitude, speed.
  * - 3-axis accelerometer (SPI).
  * - Real Time Clock (write record to storage).
- * - State machine to track rocket through ready/boost/flight/recovery/landed stages.
+ * - State machine track rocket through ready/boost/flight/recovery/landed.
  *
  * Notes
  * ~~~~~
- * - Millisecond counter cycles after 9 hours, 6 minutes and 7 seconds (a very long rocket flight).
+ * - Millisecond counter cycles after 9 hours, 6 minutes and 7 seconds.
  * - Records format ...
  *   - a:x1,y1,z1,x2,y2,z2,...  # accelerometer x, y, z-axis (m*m/s)
  *   - b:voltage                # battery voltage (volt)
@@ -53,7 +54,7 @@
  *   - g:latitude,longitude,altitude,speed,course,fix,age,date,time
  *                              # gps message
  *   - i:message                # informational message
- *   - p:pressure,temperature   # barometer pressure (pascals) and temperature (celcius)
+ *   - p:pressure,temperature   # barometer pressure (pascals), temperature (celcius)
  *   - r:seconds.milliseconds   # run-time since boot
  *   - t:temperature            # one-wire temperature (celcius)
  */
@@ -61,6 +62,7 @@
 #include <PString.h>
 #include <SdFat.h>
 #include <Spi.h>
+#include "Wire.h"
 
 #include <AikoEvents.h>
 
@@ -74,9 +76,11 @@ PString globalString(globalBuffer, sizeof(globalBuffer));
 void setup() {
   serialInitialize();
   storageInitialize();
+  barometricInitialize();
 
   Events.addHandler(heartbeatHandler,    HEARTBEAT_PERIOD);
   Events.addHandler(millisecondHandler,                 1);
+  Events.addHandler(barometricHandler,                100);
   Events.addHandler(batteryHandler,                  1000);
 }
 
