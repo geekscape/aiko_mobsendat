@@ -58,6 +58,7 @@
 #include <SdFat.h>
 #include <Spi.h>
 #include "Wire.h"
+#include <OneWire.h>
 
 #include <AikoEvents.h>
 
@@ -67,7 +68,7 @@ using namespace Aiko;
 
 char globalBuffer[GLOBAL_BUFFER_SIZE];  // Store dynamically constructed string
 PString globalString(globalBuffer, sizeof(globalBuffer));
-
+  
 void setup() {
   Wire.begin();
   
@@ -78,6 +79,7 @@ void setup() {
   Events.addHandler(millisecondHandler,                 1);
   Events.addHandler(batteryHandler,                  1000);
   Events.addHandler(barometricHandler,               1000);
+  Events.addHandler(temperatureHandler,              1000);
 }
 
 void loop() {
@@ -142,7 +144,7 @@ void heartbeatHandler(void) {
 
 const char *millisecondCounterAsString() {
   globalString.begin();
-  globalString  = "t:";
+  globalString  = "r:";
   globalString += secondCounter;
   globalString += ".";
   if (millisecondCounter < 10)  globalString += "0";
