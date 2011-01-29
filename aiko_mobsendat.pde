@@ -20,6 +20,9 @@
  * - NewSoftSerial library (download is at the bottom of the web page)
  *   http://arduiniana.org/libraries/newsoftserial
  *
+ * - OneWire library
+ *   URL ?
+ *
  * - PString library
  *   http://arduiniana.org/libraries/pstring
  *
@@ -38,7 +41,6 @@
  * - Support hardware UART serial output for diagnosis without ZigBee and GPS.
  * - Logging to micro-SD storage.
  * - Write records properly, including millisecondCounter records.
- * - One-wire temperature sensor.
  * - GPS latitude, longitude, altitude, speed.
  * - Real Time Clock (write record to storage).
  * - Selection of records to be transmitted by radio.
@@ -60,10 +62,11 @@
  *   - t:temperature            # one-wire temperature (celcius)
  */
 
+#include <OneWire.h>
 #include <PString.h>
 #include <SdFat.h>
 #include <Spi.h>
-#include "Wire.h"
+#include <Wire.h>
 
 #include <AikoEvents.h>
 
@@ -87,6 +90,7 @@ void setup() {
   Events.addHandler(accelerometerDump,               1000);
   Events.addHandler(barometricHandler,                100);
   Events.addHandler(batteryHandler,                  1000);
+  Events.addHandler(temperatureHandler,              1000);
 }
 
 void loop() {
@@ -144,7 +148,7 @@ void heartbeatHandler(void) {
 
 const char *millisecondCounterAsString() {
   globalString.begin();
-  globalString  = "t:";
+  globalString  = "r:";
   globalString += secondCounter;
   globalString += ".";
   if (millisecondCounter < 10)  globalString += "0";
