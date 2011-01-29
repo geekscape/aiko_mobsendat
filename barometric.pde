@@ -9,6 +9,7 @@
  * - Determine barometric sensor sample time.
  * - Provide a barometric calibration mechanism ... using EEPROM ?
  * - Transform barometric pressure into altitude.
+ * - Ensure that dodgey barometer hardware doesn't crash software.
  */
 
 #define BMP085_I2C_ADDRESS 0x77
