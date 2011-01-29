@@ -39,7 +39,6 @@
  * - #define for feature enable / disable.
  * - Separate configuration include file.
  * - Support hardware UART serial output for diagnosis without ZigBee and GPS.
- * - Logging to micro-SD storage.
  * - Write records properly, including millisecondCounter records.
  * - GPS latitude, longitude, altitude, speed.
  * - Real Time Clock (write record to storage).
@@ -74,6 +73,10 @@
 
 using namespace Aiko;
 
+byte storageInitialized = false;
+
+const char *errorMessage = NULL;
+
 char globalBuffer[GLOBAL_BUFFER_SIZE];  // Store dynamically constructed string
 PString globalString(globalBuffer, sizeof(globalBuffer));
 
@@ -86,11 +89,12 @@ void setup() {
 
   Events.addHandler(heartbeatHandler,    HEARTBEAT_PERIOD);
   Events.addHandler(millisecondHandler,                 1);
-  Events.addHandler(accelerometerHandler,             100);
-  Events.addHandler(accelerometerDump,               1000);
+//Events.addHandler(accelerometerHandler,             100);
+//Events.addHandler(accelerometerDump,               1000);
   Events.addHandler(barometricHandler,                100);
   Events.addHandler(batteryHandler,                  1000);
   Events.addHandler(temperatureHandler,              1000);
+  Events.addHandler(errorMessageHandler,             5000);
 }
 
 void loop() {
@@ -119,6 +123,12 @@ void sendMessage(
 
   serial.println(message);
 }
+
+void errorMessageHandler() {
+  if (errorMessage != NULL) sendMessage(errorMessage);
+}
+
+
 
 /* ------------------------------------------------------------------------- */
 

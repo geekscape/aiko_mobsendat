@@ -6,6 +6,7 @@
  *
  * To Do
  * ~~~~~
+ * - Change filename from "testit00.csv" to "rocket00.csv".
  * - Replace sendMessage() with a combined storage / transmit method.
  */
 
@@ -14,56 +15,66 @@ SdVolume volume;
 SdFile   root;
 SdFile   file;
 
+const char *infoMessageCardDetect = "i:MicroSD card detected";
+
+const char *errorMessageCardDetect = "e:MicroSD card missing";
+const char *errorMessageCardInit   = "e:MicroSD card initialization failed";
+const char *errorMessageVolumeInit = "e:MicroSD volume initialization failed";
+const char *errorMessageOpenRoot   = "e:MicroSD open root directory failed";
+const char *errorMessageOpenFile   = "e:MicroSD open telemetry file failed";
+
 void storageInitialize() {
   if (digitalRead(PIN_SD_CARD_DETECT)) {
-    Events.addHandler(storageMissingHandler, 5000);
-  }
-  else {
-    sendMessage("i:MicroSD card detected");
-  }
-/*
-  if (!card.init(SPI_HALF_SPEED, PIN_SD_CARD_SELECT)) error("card.init");
-  // initialize a FAT volume
-  if (!volume.init(card)) error("volume.init");
-  // open root directory
-  if (!root.openRoot(volume)) error("openRoot");
-
-  // create a new file
-  char name[] = "LOGGER00.CSV";
-
-  // Makes a new incremented filename every time you boot
-  for (uint8_t i = 0; i < 100; i++)
-  {
-    name[6] = i/10 + '0';
-    name[7] = i%10 + '0';
-    if (file.open(root, name, O_CREAT | O_EXCL | O_WRITE)) break;
+    errorMessage = errorMessageCardDetect;
+    return;
   }
 
-  if (!file.isOpen()) error("file.create");
-  PRN("Logging to: ");
-  PRNln(name);
+  sendMessage(infoMessageCardDetect);
+
+  if (card.init(SPI_HALF_SPEED, PIN_SD_CARD_SELECT) == false) {
+    errorMessage = errorMessageCardInit;
+    return;
+  }
+
+  if (volume.init(card) == false) {
+    errorMessage = errorMessageVolumeInit;
+    return;
+  }
+
+  if (root.openRoot(volume) == false) {
+    errorMessage = errorMessageCardDetect;
+    return;
+  }
+
+  // New incremented filename every time you boot
+
+  char filename[] = "testit00.csv";
+
+  for (uint8_t index = 0; index < 100; index ++) {
+    filename[6] = index / 10 + '0';
+    filename[7] = index % 10 + '0';
+    if (file.open(root, filename, O_CREAT | O_EXCL | O_WRITE)) break;
+  }
+
+  if (file.isOpen() == false) {
+    errorMessage = errorMessageOpenFile;
+    return;
+  }
+
+  globalString.begin();
+  globalString  = "i:Telemetry file: ";
+  globalString  = filename;
+  sendMessage(globalString);
+
   file.writeError = 0;
- */
-}
 
-void storageMissingHandler() {
-  sendMessage("e:MicroSD card missing");
+  storageInitialized = true;
 }
 
 void storageHandler() {
 }
 
 /*
-#define CSV_COLS_HEADER                         \
-  "millis,"                                     \
-  CSV_COLS_RTC                                  \
-  CSV_COLS_BPS                                  \
-  CSV_COLS_DS1820                               \
-  CSV_COLS_ACCEL                                \
-  CSV_COLS_GPS                                  \
-  "vcc"
-
-// print(ln) to file and/or rs232
 #if SERIAL_OUTPUT
   #if FILE_OUTPUT
     #define PRN(x...) do     \
