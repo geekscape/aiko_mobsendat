@@ -49,7 +49,10 @@
  *   - a:x1,y1,z1,x2,y2,z2,...  # accelerometer x, y, z-axis (m*m/s)
  *   - b:voltage                # battery voltage (volt)
  *   - d:yyyy-mm-dd hh:mm:ss    # real time clock date/time
+ *   - e:message                # error message
  *   - g:latitude,longitude,altitude,speed,course,fix,age,date,time
+ *                              # gps message
+ *   - i:message                # informational message
  *   - p:pressure,temperature   # barometer pressure (pascals) and temperature (celcius)
  *   - r:seconds.milliseconds   # run-time since boot
  *   - t:temperature            # one-wire temperature (celcius)
@@ -70,6 +73,7 @@ PString globalString(globalBuffer, sizeof(globalBuffer));
 
 void setup() {
   serialInitialize();
+  storageInitialize();
 
   Events.addHandler(heartbeatHandler,    HEARTBEAT_PERIOD);
   Events.addHandler(millisecondHandler,                 1);
@@ -101,13 +105,6 @@ void sendMessage(
   const char* message) {
 
   serial.println(message);
-}
-
-void errorMessage(
-  const char* message) {
-
-  sendMessage("error: ");
-  sendMessage(message);
 }
 
 /* ------------------------------------------------------------------------- */
