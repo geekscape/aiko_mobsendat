@@ -36,8 +36,10 @@
  * - Logging to micro-SD storage.
  * - One-wire temperature sensor.
  * - Barometric pressure and temperature.
+ * - GPS latitude, longitude, altitude, speed.
  * - 3-axis accelerometer (SPI).
  * - Real Time Clock (write record to storage).
+ * - State machine to track rocket through ready/boost/flight/recovery/landed stages.
  *
  * Notes
  * ~~~~~
