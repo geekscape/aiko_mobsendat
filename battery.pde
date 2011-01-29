@@ -15,6 +15,9 @@ const float BATTERY_CALIBRATION = 88.0f;
 void batteryHandler() {
   float voltage = ((float) (analogRead(PIN_BATTERY_VOLTAGE) / BATTERY_CALIBRATION));
 
-  serial.print("b:");
-  serial.println(voltage);
+  globalString.begin();
+  globalString  = "b:";
+  globalString += voltage;
+
+  sendMessage(globalString);
 }
