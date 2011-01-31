@@ -93,7 +93,6 @@ void setup() {
   Events.addHandler(barometricHandler,                100);
   Events.addHandler(batteryHandler,                  1000);
   Events.addHandler(temperatureHandler,              1000);
-  Events.addHandler(testHandler,                     1000);
   Events.addHandler(storageFlushHandler,             1000);
   Events.addHandler(errorMessageHandler,             5000);
 }
