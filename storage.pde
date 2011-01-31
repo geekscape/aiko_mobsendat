@@ -6,7 +6,6 @@
  *
  * To Do
  * ~~~~~
- * - Change filename from "testit00.csv" to "rocket00.csv".
  * - Replace sendMessage() with a combined storage / transmit method.
  */
 
@@ -22,6 +21,9 @@ const char *errorMessageCardInit   = "e:MicroSD card initialization failed";
 const char *errorMessageVolumeInit = "e:MicroSD volume initialization failed";
 const char *errorMessageOpenRoot   = "e:MicroSD open root directory failed";
 const char *errorMessageOpenFile   = "e:MicroSD open telemetry file failed";
+const char *errorMessageSyncFile   = "e:MicroSD sync telemetry file failed";
+
+byte storageInitialized = false;
 
 void storageInitialize() {
   if (digitalRead(PIN_SD_CARD_DETECT)) {
@@ -29,7 +31,7 @@ void storageInitialize() {
     return;
   }
 
-  sendMessage(infoMessageCardDetect);
+  sendMessage(infoMessageCardDetect, LOG_SERIAL, LOG_STORAGE);
 
   if (card.init(SPI_HALF_SPEED, PIN_SD_CARD_SELECT) == false) {
     errorMessage = errorMessageCardInit;
@@ -48,7 +50,7 @@ void storageInitialize() {
 
   // New incremented filename every time you boot
 
-  char filename[] = "testit00.csv";
+  char filename[] = "rocket00.csv";
 
   for (uint8_t index = 0; index < 100; index ++) {
     filename[6] = index / 10 + '0';
@@ -63,46 +65,30 @@ void storageInitialize() {
 
   globalString.begin();
   globalString  = "i:Telemetry file: ";
-  globalString  = filename;
-  sendMessage(globalString);
+  globalString += filename;
+  sendMessage(globalString, LOG_SERIAL, LOG_STORAGE);
 
   file.writeError = 0;
 
   storageInitialized = true;
 }
 
-void storageHandler() {
+void storageLog(
+  const char* message) {
+
+  if (storageInitialized) file.println(message);
 }
 
-/*
-#if SERIAL_OUTPUT
-  #if FILE_OUTPUT
-    #define PRN(x...) do     \
-      {                    \
-        file.print(x);  \
-        Serial.print(x);   \
-      } while(0)
-    #define PRNln(x...) do     \
-      {                    \
-        file.println(x);  \
-        Serial.println(x);   \
-      } while(0)
-  #else
-    #define PRN(x...) Serial.print(x)
-    #define PRNln(x...) Serial.println(x)
-  #endif
-#else
-  #if FILE_OUTPUT
-    #define PRN(x...) file.print(x)
-    #define PRNln(x...) file.println(x)
-  #else
-    #define PRN(x...)
-    #define PRNln(x...)
-  #endif
-#endif
+void storageFlushHandler() {
+  if (storageInitialized) {
+    if (file.sync() == false) {
+      errorMessage = errorMessageSyncFile;
 
-#define LEADING_ZERO(x)  do { if(x < 10) PRN('0');} while(0)
-#define PRNLZ(x)         do {LEADING_ZERO(x);PRN(x,DEC);}while(0)
+      storageInitialized = false;
+    }
+  }
+}
 
-#define LOG(x...)        do {PRN(',');PRN(x);}while(0)
-*/
+void storageTimeHandler() {
+  if (storageInitialized) file.println(millisecondCounterAsString());
+}

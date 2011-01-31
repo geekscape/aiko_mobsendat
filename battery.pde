@@ -19,5 +19,5 @@ void batteryHandler() {
   globalString  = "b:";
   globalString += voltage;
 
-  sendMessage(globalString);
+  sendMessage(globalString, LOG_SERIAL, LOG_STORAGE);
 }

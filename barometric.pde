@@ -95,7 +95,7 @@ void barometricHandler() {
   globalString += (".");
   globalString += (temperature % 10);
   
-  sendMessage(globalString);
+  sendMessage(globalString, false, LOG_STORAGE);
 }
 
 unsigned int bmp085_read_ut() {

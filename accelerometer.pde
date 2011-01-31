@@ -65,7 +65,9 @@ void accelerometerInitalize() {
   //set rate
   digitalWrite(PIN_ACCEL_SELECT, LOW);
   Spi.transfer(0x2C);
-  Spi.transfer(0x09);  //50Hz
+//Spi.transfer(0x09);  // 50.0 Hz
+//Spi.transfer(0x07);  // 12.5 Hz
+  Spi.transfer(0x06);  // 6.25 Hz
   digitalWrite(PIN_ACCEL_SELECT, HIGH);
   delay(5);
 
@@ -130,6 +132,6 @@ void accelerometerDump() {
     globalString += ",";
     globalString += z;
 
-    sendMessage(globalString);
+    sendMessage(globalString, false, LOG_STORAGE);
   }
 }

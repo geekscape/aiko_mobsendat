@@ -73,8 +73,6 @@
 
 using namespace Aiko;
 
-byte storageInitialized = false;
-
 const char *errorMessage = NULL;
 
 char globalBuffer[GLOBAL_BUFFER_SIZE];  // Store dynamically constructed string
@@ -89,11 +87,13 @@ void setup() {
 
   Events.addHandler(heartbeatHandler,    HEARTBEAT_PERIOD);
   Events.addHandler(millisecondHandler,                 1);
+  Events.addHandler(storageTimeHandler,               100);
 //Events.addHandler(accelerometerHandler,             100);
 //Events.addHandler(accelerometerDump,               1000);
   Events.addHandler(barometricHandler,                100);
   Events.addHandler(batteryHandler,                  1000);
   Events.addHandler(temperatureHandler,              1000);
+  Events.addHandler(storageFlushHandler,             1000);
   Events.addHandler(errorMessageHandler,             5000);
 }
 
@@ -119,16 +119,18 @@ void serialInitialize(void) {
 }
 
 void sendMessage(
-  const char* message) {
+  const char* message,
+  byte        serialFlag,
+  byte        storageFlag) {
 
-  serial.println(message);
+  if (serialFlag) serial.println(message);
+
+  if (storageFlag) storageLog(message);
 }
 
 void errorMessageHandler() {
-  if (errorMessage != NULL) sendMessage(errorMessage);
+  if (errorMessage != NULL) sendMessage(errorMessage, LOG_SERIAL, LOG_STORAGE);
 }
-
-
 
 /* ------------------------------------------------------------------------- */
 
@@ -143,22 +145,22 @@ void millisecondHandler(void) {
   }
 }
 
-void heartbeatHandler(void) {
-  sendMessage(millisecondCounterAsString());
+void heartbeatHandler(void) {                       // Never write to storage !
+  sendMessage(millisecondCounterAsString(), LOG_SERIAL, false);
 
   if (serial.available() > 0) {
     int ch = serial.read();
 
     if (ch == 'r')  {
       resetCounter();
-      sendMessage("reset");
+      sendMessage("reset", LOG_SERIAL, false);
     }
   }
 }
 
 const char *millisecondCounterAsString() {
   globalString.begin();
-  globalString  = "r:";
+  globalString  = "h:";
   globalString += secondCounter;
   globalString += ".";
   if (millisecondCounter < 10)  globalString += "0";

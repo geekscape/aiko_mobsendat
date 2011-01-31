@@ -44,12 +44,12 @@ void temperatureHandler() {  // total time: 33 milliseconds
  */
 
   if (OneWire::crc8(address, 7) != address[7]) {
-//  sendMessage("(error 'Address CRC is not valid')");
+//  sendMessage("(error 'Address CRC is not valid')", LOG_DEBUG, false);
     return;
   }
 
   if (address[0] != ONE_WIRE_DEVICE_18B20) {
-//  sendMessage("(error 'Device is not a DS18B20')");
+//  sendMessage("(error 'Device is not a DS18B20')", LOG_DEBUG, false);
     return;
   }
 
@@ -74,7 +74,7 @@ void temperatureHandler() {  // total time: 33 milliseconds
  */
 
     if (OneWire::crc8(data, 8) != data[8]) {
-//    sendMessage("(error 'Data CRC is not valid')");
+//    sendMessage("(error 'Data CRC is not valid')", LOG_DEBUG, false);
       return;
     }
 
@@ -94,7 +94,7 @@ void temperatureHandler() {  // total time: 33 milliseconds
     globalString += ".";
     if (temperature_fraction < 10) globalString += "0";
     globalString += temperature_fraction;
-    sendMessage(globalString);
+    sendMessage(globalString, LOG_SERIAL, LOG_STORAGE);
   }
 
   // Start temperature conversion with parasitic power
